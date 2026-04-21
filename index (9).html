@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Onboarding Pipeline — Live Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Epilogue:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f7f5f0;
+  --bg2: #eeece5;
+  --bg3: #e5e2d8;
+  --ink: #1c1a14;
+  --ink2: #38352a;
+  --ink3: #7a7668;
+  --rule: #d8d5c8;
+  --white: #ffffff;
+  --gold: #a07820;
+  --gold-lt: #fdf7e8;
+  --blue: #1a4a82;
+  --blue-lt: #e8f0fa;
+  --green: #1a6a3a;
+  --green-lt: #eaf5ef;
+  --red: #8a1a1a;
+  --red-lt: #faeaea;
+  --purple: #5a1a8a;
+  --purple-lt: #f3eafa;
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Epilogue', sans-serif; background: var(--bg); color: var(--ink); font-size: 15px; line-height: 1.6; }
+
+nav {
+  background: var(--white);
+  border-bottom: 1px solid var(--rule);
+  padding: 0 48px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nav-brand { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+.nav-brand span { font-style: italic; color: var(--gold); }
+.nav-links { display: flex; gap: 28px; }
+.nav-link { font-size: 13px; font-weight: 500; color: var(--ink3); text-decoration: none; transition: color 0.12s; }
+.nav-link:hover { color: var(--ink); }
+
+/* HERO */
+.hero {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 88px 48px 72px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+.hero-tag {
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(36px, 4vw, 52px);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  margin-bottom: 20px;
+}
+h1 em { font-style: italic; color: var(--gold); }
+.hero-desc { font-size: 16px; color: var(--ink3); line-height: 1.75; margin-bottom: 36px; }
+.hero-metrics { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+.metric {
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+}
+.metric-val { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--ink); line-height: 1; margin-bottom: 4px; }
+.metric-label { font-size: 11px; color: var(--ink3); font-weight: 500; }
+
+/* timeline preview on right */
+.preview-board {
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 4px 4px 0 var(--bg3), 8px 8px 0 var(--rule);
+}
+.pb-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg);
+}
+.pb-title { font-size: 13px; font-weight: 700; color: var(--ink); }
+.pb-badge { font-size: 10px; background: var(--green-lt); color: var(--green); font-weight: 600; padding: 3px 8px; border-radius: 10px; }
+.pb-steps { padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; }
+.pb-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.pbs-num {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.pbs-num.done { background: var(--green-lt); color: var(--green); }
+.pbs-num.active { background: var(--gold-lt); color: var(--gold); }
+.pbs-num.wait { background: var(--bg2); color: var(--ink3); }
+.pbs-label { font-size: 12px; color: var(--ink); font-weight: 500; flex: 1; }
+.pbs-time { font-family: 'Fira Code', monospace; font-size: 10px; color: var(--ink3); }
+.pbs-check { font-size: 12px; }
+
+/* SECTION */
+.section { max-width: 1100px; margin: 0 auto; padding: 0 48px 88px; }
+.section-label { font-family: 'Fira Code', monospace; font-size: 11px; color: var(--ink3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+.section-title { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 40px; }
+
+/* DEMO */
+.demo-layout { display: grid; grid-template-columns: 360px 1fr; gap: 28px; align-items: start; }
+
+/* CLIENT SELECTOR */
+.client-panel {
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  overflow: hidden;
+  position: sticky;
+  top: 24px;
+}
+.cp-head { padding: 14px 18px; border-bottom: 1px solid var(--rule); background: var(--bg); font-size: 12px; font-weight: 700; color: var(--ink3); text-transform: uppercase; letter-spacing: 0.06em; }
+.cp-body { padding: 14px; }
+.field-label { font-size: 11px; font-family: 'Fira Code', monospace; color: var(--ink3); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; display: block; margin-top: 16px; }
+.field-label:first-child { margin-top: 0; }
+
+.client-cards { display: flex; flex-direction: column; gap: 6px; }
+.client-card {
+  border: 1.5px solid var(--rule);
+  border-radius: 9px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.client-card:hover { border-color: var(--gold); }
+.client-card.active { border-color: var(--gold); background: var(--gold-lt); }
+.cc-name { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+.cc-type { font-size: 11px; color: var(--ink3); }
+
+.type-cards { display: flex; flex-direction: column; gap: 5px; }
+.type-card {
+  border: 1.5px solid var(--rule);
+  border-radius: 7px;
+  padding: 9px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.12s;
+  font-size: 12px;
+  font-weight: 500;
+}
+.type-card:hover { border-color: var(--blue); }
+.type-card.active { border-color: var(--blue); background: var(--blue-lt); color: var(--blue); }
+.type-icon { font-size: 14px; }
+
+.trigger-btn {
+  width: 100%;
+  margin-top: 16px;
+  background: var(--ink);
+  color: var(--white);
+  border: none;
+  padding: 13px;
+  border-radius: 8px;
+  font-family: 'Epilogue', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.12s, transform 0.1s;
+}
+.trigger-btn:hover { background: var(--ink2); transform: translateY(-1px); }
+.trigger-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+/* PIPELINE OUTPUT */
+.pipeline-output {
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.po-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg);
+}
+.po-client-name { font-size: 15px; font-weight: 700; color: var(--ink); }
+.po-status { font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 10px; }
+.po-status.idle { background: var(--bg2); color: var(--ink3); }
+.po-status.running { background: var(--gold-lt); color: var(--gold); }
+.po-status.done { background: var(--green-lt); color: var(--green); }
+
+.po-empty {
+  padding: 80px 40px;
+  text-align: center;
+  color: var(--ink3);
+  font-size: 14px;
+}
+
+.timeline { padding: 24px 28px; display: flex; flex-direction: column; gap: 0; }
+.tl-step {
+  display: flex;
+  gap: 16px;
+  position: relative;
+}
+.tl-step:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 32px;
+  bottom: -12px;
+  width: 2px;
+  background: var(--rule);
+  transition: background 0.5s;
+}
+.tl-step.tl-done:not(:last-child)::before { background: var(--green); }
+
+.tl-icon-wrap {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.tl-icon {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--rule);
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.3s;
+  z-index: 1;
+}
+.tl-step.tl-active .tl-icon { border-color: var(--gold); background: var(--gold-lt); animation: tl-pulse 1.5s infinite; }
+.tl-step.tl-done .tl-icon { border-color: var(--green); background: var(--green-lt); }
+
+@keyframes tl-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(160,120,32,0.3)}50%{box-shadow:0 0 0 6px rgba(160,120,32,0)} }
+
+.tl-content {
+  flex: 1;
+  padding: 4px 0 24px;
+}
+.tl-step-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.tl-step.tl-wait .tl-step-title { color: var(--ink3); }
+.tl-detail {
+  font-size: 12px;
+  color: var(--ink3);
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+.tl-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.tl-tag {
+  font-size: 10px;
+  font-family: 'Fira Code', monospace;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+.tl-ts { font-family: 'Fira Code', monospace; font-size: 10px; color: var(--ink3); margin-left: auto; }
+
+/* STACK */
+.stack-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.stack-card {
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: 16px;
+}
+.sc-icon { font-size: 20px; margin-bottom: 8px; }
+.sc-name { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+.sc-role { font-size: 11px; color: var(--ink3); }
+
+/* FOOTER */
+footer {
+  border-top: 1px solid var(--rule);
+  background: var(--bg2);
+  padding: 28px 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.footer-left .fn { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; margin-bottom: 3px; }
+.footer-left .fc { font-size: 12px; color: var(--ink3); font-family: 'Fira Code', monospace; }
+.footer-links { display: flex; gap: 20px; }
+.footer-link { font-size: 13px; color: var(--ink3); text-decoration: none; font-weight: 500; transition: color 0.12s; }
+.footer-link:hover { color: var(--gold); }
+
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; gap: 48px; padding: 56px 24px; }
+  .demo-layout { grid-template-columns: 1fr; }
+  .stack-grid { grid-template-columns: 1fr 1fr; }
+  .section { padding: 0 24px 64px; }
+  nav { padding: 0 24px; }
+  footer { padding: 24px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">onboarding<span>pipeline</span>.demo</div>
+  <div class="nav-links">
+    <a href="#demo" class="nav-link">Demo</a>
+    <a href="https://github.com" class="nav-link">GitHub</a>
+    <a href="mailto:tomekw2323@gmail.com" class="nav-link">Contact</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div>
+    <div class="hero-tag">// client-onboarding-pipeline</div>
+    <h1>New client.<br><em>Zero manual</em><br>steps.</h1>
+    <p class="hero-desc">Contract signed → folder created → welcome email sent → CRM updated → team notified → invoice generated. Fully automatic, in under 60 seconds.</p>
+    <div class="hero-metrics">
+      <div class="metric"><div class="metric-val">~45s</div><div class="metric-label">full onboarding</div></div>
+      <div class="metric"><div class="metric-val">8</div><div class="metric-label">steps automated</div></div>
+      <div class="metric"><div class="metric-val">0</div><div class="metric-label">clicks needed</div></div>
+    </div>
+  </div>
+  <div class="preview-board">
+    <div class="pb-header">
+      <div class="pb-title">Acme Corp — Onboarding</div>
+      <div class="pb-badge">● In progress</div>
+    </div>
+    <div class="pb-steps">
+      <div class="pb-step"><div class="pbs-num done">✓</div><span class="pbs-label">Contract received & verified</span><span class="pbs-time">09:01</span></div>
+      <div class="pb-step"><div class="pbs-num done">✓</div><span class="pbs-label">Drive folder created</span><span class="pbs-time">09:01</span></div>
+      <div class="pb-step"><div class="pbs-num done">✓</div><span class="pbs-label">Welcome email sent</span><span class="pbs-time">09:02</span></div>
+      <div class="pb-step"><div class="pbs-num done">✓</div><span class="pbs-label">CRM record created</span><span class="pbs-time">09:02</span></div>
+      <div class="pb-step"><div class="pbs-num active">→</div><span class="pbs-label">Proforma invoice generating...</span><span class="pbs-time">09:02</span></div>
+      <div class="pb-step"><div class="pbs-num wait">6</div><span class="pbs-label">Team notified on Slack</span><span class="pbs-time">—</span></div>
+      <div class="pb-step"><div class="pbs-num wait">7</div><span class="pbs-label">Onboarding tasks in Asana</span><span class="pbs-time">—</span></div>
+      <div class="pb-step"><div class="pbs-num wait">8</div><span class="pbs-label">Access credentials sent</span><span class="pbs-time">—</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="demo">
+  <div class="section-label">Interactive demo</div>
+  <div class="section-title">Pick a client and trigger onboarding</div>
+
+  <div class="demo-layout">
+    <div class="client-panel">
+      <div class="cp-head">Client config</div>
+      <div class="cp-body">
+        <span class="field-label">New client</span>
+        <div class="client-cards">
+          <div class="client-card active" onclick="selectClient(this,0)">
+            <div class="cc-name">Nova Digital Sp. z o.o.</div>
+            <div class="cc-type">Software agency · Warsaw</div>
+          </div>
+          <div class="client-card" onclick="selectClient(this,1)">
+            <div class="cc-name">MedClinic Kraków</div>
+            <div class="cc-type">Healthcare · Kraków</div>
+          </div>
+          <div class="client-card" onclick="selectClient(this,2)">
+            <div class="cc-name">GreenBuild Contractors</div>
+            <div class="cc-type">Construction · Wrocław</div>
+          </div>
+        </div>
+
+        <span class="field-label">Service type</span>
+        <div class="type-cards">
+          <div class="type-card active" onclick="selectType(this,0)"><span class="type-icon">🤖</span>AI Automation package</div>
+          <div class="type-card" onclick="selectType(this,1)"><span class="type-icon">📊</span>Data reporting setup</div>
+          <div class="type-card" onclick="selectType(this,2)"><span class="type-icon">💬</span>Chatbot implementation</div>
+        </div>
+
+        <button class="trigger-btn" id="triggerBtn" onclick="runOnboarding()">▶ Trigger onboarding</button>
+      </div>
+    </div>
+
+    <div class="pipeline-output">
+      <div class="po-header">
+        <div class="po-client-name" id="poClientName">Select a client</div>
+        <div class="po-status idle" id="poStatus">idle</div>
+      </div>
+      <div id="poContent">
+        <div class="po-empty">Select a client on the left and click "Trigger onboarding" to see the full pipeline run in real time.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-label">Tech stack</div>
+  <div class="section-title">Built with</div>
+  <div class="stack-grid">
+    <div class="stack-card"><div class="sc-icon">🐍</div><div class="sc-name">Python 3.11</div><div class="sc-role">Core pipeline logic</div></div>
+    <div class="stack-card"><div class="sc-icon">📁</div><div class="sc-name">Google Drive API</div><div class="sc-role">Folder & file creation</div></div>
+    <div class="stack-card"><div class="sc-icon">📧</div><div class="sc-name">Gmail API</div><div class="sc-role">Emails & attachments</div></div>
+    <div class="stack-card"><div class="sc-icon">💬</div><div class="sc-name">Slack Webhooks</div><div class="sc-role">Team notifications</div></div>
+    <div class="stack-card"><div class="sc-icon">🟢</div><div class="sc-name">CRM API</div><div class="sc-role">HubSpot / Pipedrive</div></div>
+    <div class="stack-card"><div class="sc-icon">✅</div><div class="sc-name">Asana API</div><div class="sc-role">Task assignment</div></div>
+    <div class="stack-card"><div class="sc-icon">🤖</div><div class="sc-name">AI / LLM</div><div class="sc-role">Email personalisation</div></div>
+    <div class="stack-card"><div class="sc-icon">📄</div><div class="sc-name">PDF generation</div><div class="sc-role">Invoices & contracts</div></div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-left">
+    <div class="fn">Tomasz Witkowski</div>
+    <div class="fc">tomekw2323@gmail.com · +48 784 237 870</div>
+  </div>
+  <div class="footer-links">
+    <a href="https://github.com" class="footer-link">GitHub →</a>
+    <a href="https://linkedin.com" class="footer-link">LinkedIn →</a>
+    <a href="mailto:tomekw2323@gmail.com" class="footer-link">Contact →</a>
+  </div>
+</footer>
+
+<script>
+const CLIENTS = [
+  { name: 'Nova Digital Sp. z o.o.', email: 'hello@novadigital.pl', city: 'Warsaw' },
+  { name: 'MedClinic Kraków', email: 'office@medclinic.pl', city: 'Kraków' },
+  { name: 'GreenBuild Contractors', email: 'info@greenbuild.pl', city: 'Wrocław' },
+];
+const TYPES = ['AI Automation package', 'Data reporting setup', 'Chatbot implementation'];
+const PRICES = [2400, 1800, 1600];
+
+let selClient = 0, selType = 0, isRunning = false;
+
+function selectClient(el, idx) {
+  document.querySelectorAll('.client-card').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  selClient = idx;
+  document.getElementById('poClientName').textContent = CLIENTS[idx].name;
+  document.getElementById('poContent').innerHTML = `<div class="po-empty">Click "Trigger onboarding" to start the pipeline.</div>`;
+  document.getElementById('poStatus').className = 'po-status idle';
+  document.getElementById('poStatus').textContent = 'idle';
+}
+
+function selectType(el, idx) {
+  document.querySelectorAll('.type-card').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  selType = idx;
+}
+
+const STEPS = [
+  {
+    icon: '📋', title: 'Contract parsed & verified',
+    detail: (c,t) => `Contract for "${t}" service signed by ${c.name}. AI extracted: client name, service scope, value, start date.`,
+    tags: [['AI extracted','var(--gold-lt)','var(--gold)'],['PDF parsed','var(--blue-lt)','var(--blue)']],
+    delay: 800
+  },
+  {
+    icon: '📁', title: 'Google Drive folder created',
+    detail: (c) => `Folder structure created: /Clients/${c.name}/ with subfolders: Contracts, Invoices, Deliverables, Communications`,
+    tags: [['Drive API','var(--blue-lt)','var(--blue)'],['permissions set','var(--green-lt)','var(--green)']],
+    delay: 900
+  },
+  {
+    icon: '📧', title: 'Welcome email sent',
+    detail: (c) => `Personalised welcome email sent to ${c.email}. Includes: project brief, timeline, first call scheduling link.`,
+    tags: [['Gmail API','var(--red-lt)','var(--red)'],['AI written','var(--gold-lt)','var(--gold)']],
+    delay: 1000
+  },
+  {
+    icon: '🟢', title: 'CRM record created',
+    detail: (c,t) => `New contact & deal created in CRM. Stage: Onboarding. Service: ${t}. Source: contract webhook.`,
+    tags: [['CRM API','var(--green-lt)','var(--green)'],['deal created','var(--green-lt)','var(--green)']],
+    delay: 900
+  },
+  {
+    icon: '📄', title: 'Proforma invoice generated',
+    detail: (c,t,p) => `Invoice #PRO-${Math.floor(Math.random()*900+100)} generated for ${c.name}. Amount: €${p.toLocaleString()}. Payment terms: 14 days.`,
+    tags: [['PDF generated','var(--blue-lt)','var(--blue)'],['sent to email','var(--blue-lt)','var(--blue)']],
+    delay: 1100
+  },
+  {
+    icon: '💬', title: 'Team notified on Slack',
+    detail: (c) => `#new-clients channel pinged: "🎉 New client onboarded: ${c.name}. Check CRM for details and assign yourself to tasks."`,
+    tags: [['Slack webhook','var(--purple-lt)','var(--purple)']],
+    delay: 700
+  },
+  {
+    icon: '✅', title: 'Onboarding tasks created in Asana',
+    detail: () => `6 onboarding tasks created and assigned: kickoff call, requirements doc, environment setup, first delivery, review, sign-off.`,
+    tags: [['Asana API','var(--red-lt)','var(--red)'],['6 tasks','var(--green-lt)','var(--green)']],
+    delay: 900
+  },
+  {
+    icon: '🔑', title: 'Access credentials sent',
+    detail: (c) => `Secure password-protected email sent to ${c.email} with login links, credentials, and getting-started documentation.`,
+    tags: [['encrypted','var(--ink3)','var(--bg3)'],['Gmail API','var(--red-lt)','var(--red)']],
+    delay: 800
+  },
+];
+
+async function runOnboarding() {
+  if (isRunning) return;
+  isRunning = true;
+  const btn = document.getElementById('triggerBtn');
+  btn.disabled = true; btn.textContent = '● Running...';
+
+  const client = CLIENTS[selClient];
+  const type = TYPES[selType];
+  const price = PRICES[selType];
+
+  document.getElementById('poClientName').textContent = client.name;
+  document.getElementById('poStatus').className = 'po-status running';
+  document.getElementById('poStatus').textContent = '● running';
+  document.getElementById('poContent').innerHTML = '<div class="timeline" id="timeline"></div>';
+
+  const timeline = document.getElementById('timeline');
+  const now = new Date();
+
+  for (let i = 0; i < STEPS.length; i++) {
+    const step = STEPS[i];
+    const stepEl = document.createElement('div');
+    stepEl.className = 'tl-step tl-active';
+    stepEl.id = `step-${i}`;
+
+    const time = new Date(now.getTime() + i * 7000);
+    const ts = time.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    const detail = step.detail(client, type, price);
+    const tagsHtml = step.tags.map(([label, bg, color]) =>
+      `<span class="tl-tag" style="background:${bg};color:${color};">${label}</span>`
+    ).join('');
+
+    stepEl.innerHTML = `
+      <div class="tl-icon-wrap">
+        <div class="tl-icon">${step.icon}</div>
+      </div>
+      <div class="tl-content">
+        <div class="tl-step-title">${step.title}</div>
+        <div class="tl-detail">${detail}</div>
+        <div class="tl-meta">
+          ${tagsHtml}
+          <span class="tl-ts">${ts}</span>
+        </div>
+      </div>`;
+
+    timeline.appendChild(stepEl);
+    stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    await new Promise(r => setTimeout(r, step.delay));
+
+    stepEl.classList.remove('tl-active');
+    stepEl.classList.add('tl-done');
+  }
+
+  document.getElementById('poStatus').className = 'po-status done';
+  document.getElementById('poStatus').textContent = '✓ complete';
+
+  isRunning = false;
+  btn.disabled = false;
+  btn.textContent = '▶ Run again';
+}
+
+// init
+document.getElementById('poClientName').textContent = CLIENTS[0].name;
+</script>
+</body>
+</html>
